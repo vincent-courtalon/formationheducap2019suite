@@ -1,0 +1,19 @@
+<div *ngIf="editedVin && listeterroirs">
+    <form>
+        <div class="form-group">
+            <label for="nom">nom du vin</label>
+            <input type="text" class="form-control" name="nom" id="nom" [(ngModel)]="editedVin.nom" />
+        </div>
+        <div class="form-group">
+            <label for="annee">millesime du vin</label>
+            <input type="number" class="form-control" name="annee" id="annee" [(ngModel)]="editedVin.annee" />
+        </div>
+        <div class="form-group">
+            <label for="idTerroir">terroir du vin</label>
+            <select [(ngModel)]="idTerroir" id="idTerroir" name="idTerroir" class="form-control">
+                <option *ngFor="let t of listeterroirs" [value]="t.id">{{t.nom}}</option>
+            </select>
+        </div>
+        <button class="btn btn-success" (click)="update()">sauvegarder vin</button>
+    </form>
+</div>

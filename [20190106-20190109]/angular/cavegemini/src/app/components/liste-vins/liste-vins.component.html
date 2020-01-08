@@ -1,0 +1,13 @@
+<table class="table table-striped">
+    <thead>
+        <tr><th>nom</th><th>terroir</th><th>annee</th><th>actions</th></tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let vin of vins">
+            <td>{{vin.nom}}</td>
+            <td>{{vin.terroir ? vin.terroir.nom : 'pas de terroir'}}</td>
+            <td>{{vin.annee}}</td>
+            <td><button class="btn btn-primary" (click)="edit(vin)">editer</button></td>
+        </tr>
+    </tbody>
+</table>
