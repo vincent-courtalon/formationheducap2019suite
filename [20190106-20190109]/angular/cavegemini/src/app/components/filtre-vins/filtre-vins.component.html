@@ -1,1 +1,13 @@
-<p>filtre-vins works!</p>
+<form>
+    <div class="form-group">
+        <label for="choixTerroir">filter par terroir</label>
+        <select class="form-control"
+                name="choixTerroir"
+                id="choixTerroir"
+                [(ngModel)]="choixTerroir"
+                (ngModelChange)="onChoixTerroir($event)">
+            <option value="0">pas de filtre</option>
+            <option *ngFor="let t of terroirs" [value]="t.id">{{t.nom}}</option>
+        </select>
+    </div>
+</form>
