@@ -1,5 +1,6 @@
 package com.edugroupe.revision2form.web;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.edugroupe.revision2form.metier.Caracteristique;
 import com.edugroupe.revision2form.metier.Terroir;
 import com.edugroupe.revision2form.metier.Vin;
 import com.edugroupe.revision2form.metier.projection.VinAvecCaracteristiques;
+import com.edugroupe.revision2form.repositories.CaracteristiqueRespository;
 import com.edugroupe.revision2form.repositories.TerroirRepository;
 import com.edugroupe.revision2form.repositories.VinRepository;
 
@@ -39,14 +42,29 @@ public class VinController {
 
 	@Autowired private VinRepository vinRepository;
 	@Autowired private TerroirRepository terroirRepository;
+	@Autowired private CaracteristiqueRespository caracteristiqueRespository;
 	
 	@GetMapping
 	public Page<VinAvecCaracteristiques> findAll(@PageableDefault Pageable page,
-												 @RequestParam("terroirId") Optional<Integer> terroirId) {
-		if (terroirId.isPresent()) {
+												 @RequestParam("terroirId") Optional<Integer> terroirId,
+												 @RequestParam("caracteristiquesId") Optional<List<Integer>> caracteristiquesId) {
+		
+		if (terroirId.isPresent() && caracteristiquesId.isPresent()) {
+			return vinRepository.findDistinctByCaracteristiquesIdInAndTerroirId(
+					caracteristiquesId.get(), terroirId.get(), page)
+					.map(vin -> 
+					projectionFactory.createProjection(VinAvecCaracteristiques.class, vin));
+		}
+		else if (terroirId.isPresent()) {
 			return vinRepository.findByTerroirId(terroirId.get(), page)
 					.map(vin -> 
 					projectionFactory.createProjection(VinAvecCaracteristiques.class, vin));			
+		}
+		else if (caracteristiquesId.isPresent()) {
+			return vinRepository.findDistinctByCaracteristiquesIdIn(caracteristiquesId.get(),
+																	page)
+					.map(vin -> 
+					projectionFactory.createProjection(VinAvecCaracteristiques.class, vin));
 		}
 		else
 			return vinRepository.findAll(page)
@@ -87,11 +105,12 @@ public class VinController {
 		return new ResponseEntity<Vin>(editedVin, HttpStatus.ACCEPTED);
 	}
 	*/
-	
+	// "2,5,12,13"  -> [2 , 5 , 12 , 13]
 	@PutMapping(value="/{id:[0-9]+}")
-	public ResponseEntity<Vin> updateVin(@PathVariable("id") int id,
+	public ResponseEntity<VinAvecCaracteristiques> updateVin(@PathVariable("id") int id,
 										 @RequestBody Vin vin,
-										 @RequestParam("idTerroir") int idTerroir) {
+										 @RequestParam("idTerroir") int idTerroir,
+										 @RequestParam("idCaracteristiques") List<Integer> idCaracteristiques) {
 		Optional<Vin> originalvin = this.vinRepository.findById(id);
 		if (!originalvin.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -100,8 +119,18 @@ public class VinController {
 		editedVin.setAnnee(vin.getAnnee());
 		editedVin.setNom(vin.getNom());
 		editedVin.setTerroir(terroirRepository.findById(idTerroir).orElse(null));
+		// je récupere les nouvelles caractéristiques à associer au vin
+		Iterable<Caracteristique> newcarac = caracteristiqueRespository.findAllById(idCaracteristiques);
+		// je vide les précédentes cractéristiques
+		editedVin.getCaracteristiques().clear();
+		// je rajoute toutes les nouvelles caracteristiques
+		for (Caracteristique c : newcarac)
+			editedVin.getCaracteristiques().add(c);
+		
 		editedVin = vinRepository.save(editedVin);
-		return new ResponseEntity<Vin>(editedVin, HttpStatus.ACCEPTED);
+		return new ResponseEntity<VinAvecCaracteristiques>(
+				projectionFactory.createProjection(VinAvecCaracteristiques.class, editedVin),
+				HttpStatus.ACCEPTED);
 	}
 
 }

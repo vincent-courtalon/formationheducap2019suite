@@ -1,13 +1,23 @@
 <form>
-    <div class="form-group">
-        <label for="choixTerroir">filter par terroir</label>
-        <select class="form-control"
-                name="choixTerroir"
-                id="choixTerroir"
-                [(ngModel)]="choixTerroir"
-                (ngModelChange)="onChoixTerroir($event)">
-            <option value="0">pas de filtre</option>
-            <option *ngFor="let t of terroirs" [value]="t.id">{{t.nom}}</option>
-        </select>
+    <div class="row ml-1">
+        <div class="form-group">
+            <label for="choixTerroir">filter par terroir</label>
+            <select class="form-control"
+                    name="choixTerroir"
+                    id="choixTerroir"
+                    [(ngModel)]="choixTerroir"
+                    (ngModelChange)="onChoixTerroir($event)">
+                <option value="0">pas de filtre</option>
+                <option *ngFor="let t of terroirs" [value]="t.id">{{t.nom}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="row ml-1 mr-1 mt-1">
+        <span class="badge mr-1 mb-1" 
+            [ngClass]="{'badge-success' : carac[1], 'badge-secondary' : !carac[1]}"
+            *ngFor="let carac of lesCaracteristiques"
+            (click)="switchCarac(carac)">
+                    {{carac[0].libelle}}
+        </span>
     </div>
 </form>
