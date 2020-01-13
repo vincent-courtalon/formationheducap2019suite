@@ -1,0 +1,15 @@
+<form>
+    <div class="row ml-1">
+        <div class="form-group">
+            <label for="choixEditeur">filter par editeur</label>
+            <select class="form-control"
+                    name="choixEditeur"
+                    id="choixEditeur"
+                    [(ngModel)]="choixEditeur"
+                    (ngModelChange)="onChoixEditeur($event)">
+                <option value="0">pas de filtre</option>
+                <option *ngFor="let ed of editeurs" [value]="ed.id">{{ed.nom}}</option>
+            </select>
+        </div>
+    </div>
+</form>

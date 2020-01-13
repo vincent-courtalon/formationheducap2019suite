@@ -1,0 +1,21 @@
+<div class="col-xs-12 col-12">
+    <pagination [totalItems]="pageJv.totalElements"
+                [itemsPerPage]="pageJv.size"
+                 [(ngModel)]="currentPage"
+                 (pageChanged)="pageChanged($event)"></pagination>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th><th>NOM</th><th>DATE</th><th>EDITEUR</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let jv of pageJv.content">
+            <td>{{jv.id}}</td>
+            <td>{{jv.nom}}</td>
+            <td>{{jv.dateSortie | date : 'yyyy-MM-dd'}}</td>
+            <td>{{jv.editeur.nom}}</td>
+        </tr>
+    </tbody>
+</table>

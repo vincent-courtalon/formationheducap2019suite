@@ -1,0 +1,8 @@
+<div class="row">
+    <div class="col-sm-3">
+        <app-filtre-jeux [editeurs]="editeurs" (filtreEditeur)="changeEditeur($event)"></app-filtre-jeux>
+    </div>
+    <div class="col-sm-9">
+     <app-liste-jeux [jeuxvideos]="jeuxVideos" (changePage)="changePage($event)"></app-liste-jeux>
+    </div>
+</div>
