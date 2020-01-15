@@ -10,7 +10,7 @@ import { Editeur } from '../metier/editeur';
 })
 export class JeuxVideosRepositoryService {
 
-  private serviceUrl : string = 'http://localhost:8080/jeuxvideos';
+  private serviceUrl : string = 'http://localhost:8181/jeuxvideos';
 
   private jeuxVideosSubject : BehaviorSubject<Page<JeuxVideo>>;
 
