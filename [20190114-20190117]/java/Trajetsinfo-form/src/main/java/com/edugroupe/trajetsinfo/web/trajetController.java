@@ -22,10 +22,11 @@ public class trajetController {
 	
 	
 	@GetMapping()
-	public ResponseEntity<Trajet> hotelDeVille(@RequestParam("depart") String depart,
+	public ResponseEntity<Trajet> hotelDeVille(
+			@RequestParam("depart") String depart,
 			@RequestParam("arrivee") String arrivee) {
 		return trajetDAO.trouverParDepartArrivee(depart, arrivee)
-							  .map(v -> new ResponseEntity<>(v, HttpStatus.OK))
+							  .map(t -> new ResponseEntity<>(t, HttpStatus.OK))
 							  .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 }

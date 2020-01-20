@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.SqlResultSetMapping;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,8 @@ public class TrajetDAO {
 	@Transactional(readOnly = true)
 	public Optional<Trajet> trouverParDepartArrivee(String depart, String arrivee) {
 		
-		Query q = em.createNativeQuery("SELECT v1.nom as depart,\n" + 
+		Query q = em.createNativeQuery(
+				"SELECT v1.nom as depart,\n" + 
 				"        v2.nom as arrivee,\n" + 
 				"    	ST_Distance_Sphere(v1.coordonnee, v2.coordonnee) / 1000.0 as dist_km\n" + 
 				"    FROM `ville` as v1\n" + 
