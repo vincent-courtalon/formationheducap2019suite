@@ -1,0 +1,2 @@
+sudo docker build -t hotelsapp .
+sudo docker run --name hotelsinfos -d --network devnet02 hotelsapp

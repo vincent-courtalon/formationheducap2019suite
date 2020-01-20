@@ -1,0 +1,3 @@
+sudo docker build -t mysqlhotels .
+
+sudo docker run --name mysqlhotels -d -e MYSQL_DATABASE=base_hotelsinfo -e MYSQL_ROOT_PASSWORD=root --network devnet02  mysqlhotels
