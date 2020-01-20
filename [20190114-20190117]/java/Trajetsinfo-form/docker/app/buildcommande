@@ -1,0 +1,2 @@
+sudo docker build -t trajetsinfos .
+sudo docker run --name trajetsinfos -d --network devnet02 trajetsinfos

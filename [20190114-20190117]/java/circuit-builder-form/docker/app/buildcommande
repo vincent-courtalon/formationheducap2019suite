@@ -1,0 +1,2 @@
+sudo docker build -t circuitsapp .
+sudo docker run --name circuitsapp -d --network devnet02 -p 8181:8080 circuitsapp

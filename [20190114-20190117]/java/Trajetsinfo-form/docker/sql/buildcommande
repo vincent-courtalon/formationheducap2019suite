@@ -1,0 +1,3 @@
+sudo docker build -t mysqltrajet .
+
+sudo docker run --name mysqltrajet -d -e MYSQL_DATABASE=base_trajet -e MYSQL_ROOT_PASSWORD=root --network devnet02  mysqltrajet
