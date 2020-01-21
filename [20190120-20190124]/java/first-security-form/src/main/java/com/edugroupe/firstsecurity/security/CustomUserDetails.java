@@ -2,6 +2,7 @@ package com.edugroupe.firstsecurity.security;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,7 +34,12 @@ public class CustomUserDetails implements UserDetails {
 	// renvoie les roles, ou authorisations de notre utilisateur
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
+		return this.utilisateur.getRoles().stream()
+					.map(r -> r.getRoleName())
+					.map(rolename -> new SimpleGrantedAuthority(rolename))
+					.collect(Collectors.toList());
+		
+		//return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
 	}
 	
 

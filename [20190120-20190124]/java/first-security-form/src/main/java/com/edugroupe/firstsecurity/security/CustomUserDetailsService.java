@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<Utilisateur> u = utilisateurRepository.findByLogin(username);
+		Optional<Utilisateur> u = utilisateurRepository.findWithRoleByLogin(username);
 		if (!u.isPresent())
 			throw new UsernameNotFoundException("login/password invalide");
 		
