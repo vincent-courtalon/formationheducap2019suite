@@ -1,4 +1,6 @@
-package com.edugroupe.firstsecurity.security;
+package com.edugroupe.mymovie.security;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 
 // jsr250Enabled -> @RoleAllowed possible
@@ -22,18 +26,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private PasswordEncoder passwordEncoder;
-	// cet encoder n'encode rien
-	// spring security depuis spring 5, requiert obligatoirement
-	// un password encoder
-	// celui-ci est censé encoder les mot de passes (typiquement par hashage)
-	// ici, on ne vaut pas hasher les mots de passe
-	// donc on utilise un encoder spécial qui ne fait rien
-	// le nooppasswordencoder
+	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		if (passwordEncoder == null)
 			passwordEncoder = new BCryptPasswordEncoder();
-			//passwordEncoder = NoOpPasswordEncoder.getInstance();
 		return passwordEncoder;
 	}
 	
@@ -43,28 +40,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// authentification en memoire, les comptes utilisateurs sont défini directement ici
-		// et n'existe que dans la mémoire après
-		// utile dans des cas simples ou pour tester
-		/*auth.inMemoryAuthentication()
-				.withUser("admin").password("admin").roles("ADMIN", "USER").and()
-				.withUser("vincent").password("1234").roles("USER").and()
-				.passwordEncoder(passwordEncoder());
-		*/
-		// auth.jdbcAuthentication().
-		// authentification via un service custom, ici le notre requetant la base via repository
-		// spring data
 		auth.userDetailsService(userDetailsService)
 			.passwordEncoder(passwordEncoder());
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/home/admin").hasRole("ADMIN")
-								.antMatchers("/home").hasAnyRole("ADMIN", "USER")
-								//.antMatchers(HttpMethod.POST, "/infos/**").authenticated()
-								.antMatchers("/infos/**").authenticated()
-								.antMatchers("/").authenticated()
+		// ajout de la configuration cors
+		// nécéssaire pour qu'on puisse examiner la réponse 401/403 coté angular
+		http.cors()
+			.configurationSource(new CorsConfigurationSource() {
+				@Override
+				public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+					CorsConfiguration cf = new CorsConfiguration();
+					cf.applyPermitDefaultValues();
+					cf.addAllowedOrigin("http://localhost:4200");
+					cf.addAllowedMethod(HttpMethod.GET);
+					cf.addAllowedMethod(HttpMethod.POST);
+					cf.addAllowedMethod(HttpMethod.PUT);
+					cf.addAllowedMethod(HttpMethod.PATCH);
+					cf.addAllowedMethod(HttpMethod.DELETE);
+					cf.addAllowedMethod(HttpMethod.OPTIONS);
+					return cf;
+				}
+			}).and()
+			.authorizeRequests().antMatchers("/api", "/api/**").hasRole("ADMIN")
+								.antMatchers("/movies", "/movies/**").authenticated()
+								.antMatchers("/mylogin").authenticated()
 			.and().httpBasic()
 			.and().csrf().disable();
 	}

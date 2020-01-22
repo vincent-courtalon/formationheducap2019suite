@@ -1,0 +1,18 @@
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>TITRE</th>
+            <th>DATE SORTIE</th>
+            <th>DUREE MINUTE</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let m of movies">
+            <td>{{m.id}}</td>
+            <td>{{m.titre}}</td>
+            <td>{{m.dateSortie}}</td>
+            <td>{{m.dureeMinutes}}</td>
+        </tr>
+    </tbody>
+</table>
