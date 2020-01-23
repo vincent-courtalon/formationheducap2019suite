@@ -9,13 +9,15 @@ import { FormsModule } from "@angular/forms";
 import { LoginComponent } from './components/login/login.component';
 import { AuthInterceptorService } from './services/auth-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MovieEditComponent } from './components/movie-edit/movie-edit.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     MovieListComponent,
-    LoginComponent
+    LoginComponent,
+    MovieEditComponent
     
   ],
   imports: [

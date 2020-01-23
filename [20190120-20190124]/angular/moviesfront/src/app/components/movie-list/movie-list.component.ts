@@ -4,6 +4,7 @@ import { Movie } from 'src/app/metier/movie';
 import { Subscription } from 'rxjs';
 import { Page } from 'src/app/metier/page';
 import { AuthManagerService } from 'src/app/services/auth-manager.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-movie-list',
@@ -16,7 +17,8 @@ export class MovieListComponent implements OnInit, OnDestroy {
   public movies : Movie[] = [];
   private moviesSubscription : Subscription;
 
-  constructor( private moviesRepository : MovieRepositoryService, private authManager : AuthManagerService) { }
+  constructor( private moviesRepository : MovieRepositoryService,
+               private authManager : AuthManagerService) { }
 
   ngOnInit() {
     this.moviesSubscription = this.moviesRepository.getMoviesAsObservable()
@@ -33,7 +35,8 @@ export class MovieListComponent implements OnInit, OnDestroy {
     return this.authManager.userHasRole('ROLE_ADMIN');
   }
 
-  creerFilm() : void {
+  /*creerFilm() : void {
     console.log("création de film");
-  }
+
+  }*/
 }

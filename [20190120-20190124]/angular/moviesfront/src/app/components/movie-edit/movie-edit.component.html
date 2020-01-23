@@ -1,0 +1,19 @@
+
+<div class="row">
+    <form (ngSubmit)="trySave()">
+        <div class="form-group">
+            <label for="titre">titre du film</label>
+            <input type="text" name="titre" id="titre" class="form-control"  [(ngModel)]="editMovie.titre"/><br />
+        </div>
+        <div class="form-group">
+            <label for="dateSortie">date de sortie du film</label>
+            <input type="date" name="dateSortie" id="dateSortie" class="form-control"  [(ngModel)]="editMovie.dateSortie"/><br />
+        </div>
+        <div class="form-group">
+            <label for="dureeMinutes">date de sortie du film</label>
+            <input type="number" name="dureeMinutes" id="dureeMinutes" class="form-control"  [(ngModel)]="editMovie.dureeMinutes"/><br />
+        </div>
+        <input type="submit" class="btn btn-success" value="sauvegarder" />
+
+    </form>
+</div>

@@ -27,6 +27,9 @@ export class MovieRepositoryService {
     this.http.get<Page<Movie>>(this.serviceUrl).subscribe(p => this.moviesSubject.next(p));
   }
 
+  public saveMovie(movie :Movie) : Observable<Movie> {
+    return this.http.post<Movie>(this.serviceUrl, movie);
+  }
 
 
 }
