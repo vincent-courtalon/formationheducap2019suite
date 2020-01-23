@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// ajout de la configuration cors
 		// nécéssaire pour qu'on puisse examiner la réponse 401/403 coté angular
 		http.cors()
-			.configurationSource(new CorsConfigurationSource() {
+			/*.configurationSource(new CorsConfigurationSource() {
 				@Override
 				public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 					CorsConfiguration cf = new CorsConfiguration();
@@ -63,7 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					cf.addAllowedMethod(HttpMethod.OPTIONS);
 					return cf;
 				}
-			}).and()
+			})*/
+			.and()
 			.authorizeRequests().antMatchers("/api", "/api/**").hasRole("ADMIN")
 								.antMatchers("/movies", "/movies/**").authenticated()
 								.antMatchers("/mylogin").authenticated()

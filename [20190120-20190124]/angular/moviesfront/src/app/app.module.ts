@@ -8,6 +8,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { FormsModule } from "@angular/forms";
 import { LoginComponent } from './components/login/login.component';
 import { AuthInterceptorService } from './services/auth-interceptor.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { AuthInterceptorService } from './services/auth-interceptor.service';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule
   ],
   providers: [
     {
