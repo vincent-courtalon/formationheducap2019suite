@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.edugroupe.myinjection.metier.Lecture;
-import com.edugroupe.myinjection.repositories.JDBCLivreRepository;
+import com.edugroupe.myinjection.repositories.JDBCLivreRepositoryInterface;
 
 @RestController
 @RequestMapping("/lectures")
 public class LectureController {
 	
-	@Autowired private JDBCLivreRepository jdbcLivreRepository;
+	@Autowired private JDBCLivreRepositoryInterface jdbcLivreRepository;
 	
 	@GetMapping("/search")
 	public List<Lecture> search(@RequestParam("searchTerm") String searchTerm) {

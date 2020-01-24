@@ -1,0 +1,19 @@
+<h2>mon super blog</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>TITRE</th>
+      <th>CORPS html</th>
+      <th>CORPS script</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let msg of messages | async">
+      <td>{{msg.id}}</td>
+      <td>{{msg.titre}}</td>
+      <td [innerHTML]="msg.corps | myunsafe : html"></td>
+      <td [innerHTML]="msg.corps | myunsafe : script"></td>
+    </tr>
+  </tbody>
+</table>
