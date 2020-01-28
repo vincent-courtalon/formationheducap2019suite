@@ -10,6 +10,7 @@ import { LoginComponent } from './components/login/login.component';
 import { AuthInterceptorService } from './services/auth-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MovieEditComponent } from './components/movie-edit/movie-edit.component';
+import { UtilisateurStatusComponent } from './components/utilisateur-status/utilisateur-status.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { MovieEditComponent } from './components/movie-edit/movie-edit.component
     AppComponent,
     MovieListComponent,
     LoginComponent,
-    MovieEditComponent
+    MovieEditComponent,
+    UtilisateurStatusComponent
     
   ],
   imports: [

@@ -1,0 +1,3 @@
+
+<button *ngIf="!currentUser[1]" class="btn btn-outline-primary" routerLink="/login">Login</button>
+<button *ngIf="currentUser[1]" class="btn btn-outline-danger" (click)="logout()">{{currentUser[0].login}} Logout</button>

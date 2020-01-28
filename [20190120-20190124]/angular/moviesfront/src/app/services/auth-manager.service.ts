@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Utilisateur } from '../metier/Utilisateur';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +9,17 @@ export class AuthManagerService {
 
   private currentUser : Utilisateur;
 
+  private userSubject : BehaviorSubject<[Utilisateur, boolean]>;
+
+
+  constructor() { 
+    this.currentUser = null;
+    this.userSubject = new BehaviorSubject([this.currentUser, false]);
+  }
+
+  public getUserAsObservable() : Observable<[Utilisateur, boolean]> {
+    return this.userSubject.asObservable();
+  }
 
   public userHasRole(rolename : string) : boolean {
     if (this.isLoggedIn() && this.currentUser.roles) {
@@ -22,6 +34,10 @@ export class AuthManagerService {
 
   public setCurrentUser(utilisateur : Utilisateur) : void {
     this.currentUser = utilisateur;
+    if (this.currentUser == null) 
+      this.userSubject.next([this.currentUser, false]);
+    else 
+      this.userSubject.next([this.currentUser, true]);
   }
 
   public isLoggedIn() : boolean {
@@ -32,7 +48,4 @@ export class AuthManagerService {
     return window.btoa(this.currentUser.login + ":" + this.currentUser.password);
   }
 
-  constructor() { 
-    this.currentUser = null;
-  }
 }
