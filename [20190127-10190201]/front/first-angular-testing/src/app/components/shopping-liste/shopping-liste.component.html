@@ -1,0 +1,10 @@
+<h3>ma liste shopping</h3>
+<hr />
+<input name="nouvelAchat" type="text" [(ngModel)]="nouvelAchat" />
+<button id="addButton" (click)="ajouterAchat()">ajouter achat</button> <br />
+<app-shopping-summary [totalCount]='listeAchats.length'></app-shopping-summary>
+<app-shopping-filter (filterTerm)="filtrerListe($event)"></app-shopping-filter>
+<ul id="listeCourse">
+    <li *ngFor="let achat of listeAchatsFiltree">{{achat}}</li>
+</ul>
+
