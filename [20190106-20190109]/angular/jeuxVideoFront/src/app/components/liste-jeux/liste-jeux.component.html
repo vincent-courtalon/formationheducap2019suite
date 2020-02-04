@@ -10,7 +10,7 @@
             <th>ID</th><th>NOM</th><th>DATE</th><th>EDITEUR</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody *ngIf="pageJv">
         <tr *ngFor="let jv of pageJv.content">
             <td>{{jv.id}}</td>
             <td>{{jv.nom}}</td>
