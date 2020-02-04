@@ -6,16 +6,34 @@ import { ShoppingSummaryComponent } from '../shopping-summary/shopping-summary.c
 import { MockComponent } from "ng-mocks";
 import { By } from '@angular/platform-browser';
 import { ShoppingFilterComponent } from '../shopping-filter/shopping-filter.component';
+import { AchatsRepositoryService } from 'src/app/services/achats-repository.service';
+
+// une classe representant mon faux service de test
+class FakeAchatRepository {
+  public getListeAchats() : string[] {
+    return [];
+  }
+}
+
 
 describe('ShoppingListeComponent', () => {
-
-
+  // j'instancie mon faux service pour les tests
+  const fakeAchatRepository = new FakeAchatRepository();
+  // mon espion sur le faux service
+  let  spyAchatRepo;
   beforeEach(async(() => {
+    // avant chaque test, je rajoute un espion sur la méthode getListeAchcats
+    // du faux service, qui renverra mes données de test
+    spyAchatRepo = spyOn(fakeAchatRepository, 'getListeAchats').and.returnValue(["fraise tagada", "nouvelle poignee porte", "coca"]);
+    // je configure mon environnement de test avace des composnat Mock et mon faux service
     TestBed.configureTestingModule({
       declarations: [ ShoppingListeComponent,
                       MockComponent(ShoppingSummaryComponent),
                       MockComponent(ShoppingFilterComponent) ],
-      imports: [FormsModule]
+      imports: [FormsModule],
+      providers: [
+        {provide: AchatsRepositoryService, useValue: fakeAchatRepository} // injection du faux service dans le composant
+      ]
     })
     .compileComponents();
   }));
@@ -25,12 +43,14 @@ describe('ShoppingListeComponent', () => {
 
   it('should have 3 items in ul list of achats and first is "fraise tagada"', () => {
     const fixture = TestBed.createComponent(ShoppingListeComponent);
-    const ShoppingComponent = fixture.debugElement.componentInstance;
+    const shoppingComponent = fixture.debugElement.componentInstance;
     const rendered = fixture.debugElement.nativeElement;
+    
     fixture.detectChanges();
     let liste = rendered.querySelectorAll("ul#listeCourse li");
     expect(liste[0].textContent).toContain("fraise tagada");
     expect(liste.length).toEqual(3);
+    expect(spyAchatRepo).toHaveBeenCalledTimes(1);
   });
 
   it('nouvelAchat should contain typed text from input', () => {
@@ -60,7 +80,7 @@ describe('ShoppingListeComponent', () => {
     const liste = rendered.querySelectorAll("ul#listeCourse li");
     expect(liste.length).toEqual(4);
     expect(liste[3].textContent).toContain("miel des carpathes");
-
+    expect(spyAchatRepo).toHaveBeenCalledTimes(1);
   })
 
   it('liste summary should receive list size when updated', () => {

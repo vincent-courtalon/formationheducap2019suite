@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AchatsRepositoryService } from 'src/app/services/achats-repository.service';
 
 @Component({
   selector: 'app-shopping-liste',
@@ -7,14 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ShoppingListeComponent implements OnInit {
 
-  public listeAchats : string[] = ["fraise tagada", "nouvelle poignee porte", "coca"];
+  public listeAchats : string[]; // = ["fraise tagada", "nouvelle poignee porte", "coca"];
   public listeAchatsFiltree : string[];
   public nouvelAchat: string = "";
   public filtre = "";
 
-  constructor() {
+  constructor(private achatRepository : AchatsRepositoryService) {
     // copie de la liste
-    this.listeAchatsFiltree = this.listeAchats.slice();
+    this.listeAchats = this.achatRepository.getListeAchats();
+    this.listeAchatsFiltree =  this.listeAchats.slice();
    }
 
   ngOnInit() {
