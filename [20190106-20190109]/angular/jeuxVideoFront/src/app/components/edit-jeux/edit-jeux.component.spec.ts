@@ -3,8 +3,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { EditJeuxComponent } from './edit-jeux.component';
 
 describe('EditJeuxComponent', () => {
-  let component: EditJeuxComponent;
-  let fixture: ComponentFixture<EditJeuxComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -13,13 +11,11 @@ describe('EditJeuxComponent', () => {
     .compileComponents();
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(EditJeuxComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
   it('should create', () => {
+    const fixture = TestBed.createComponent(EditJeuxComponent);
+    const component = fixture.debugElement.componentInstance;
     expect(component).toBeTruthy();
+
   });
 });

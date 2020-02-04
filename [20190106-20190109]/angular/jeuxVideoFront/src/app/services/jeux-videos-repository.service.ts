@@ -17,12 +17,12 @@ export class JeuxVideosRepositoryService {
   private numeroPage : number;
   private filtreEditeur : number;
 
-  setNumeroPage(numeroPage : number) : void {
+  public setNumeroPage(numeroPage : number) : void {
     this.numeroPage = numeroPage;
     this.refreshJeuxVideos();
   }
 
-  setFiltreEditeur(editeurId : number) : void {
+  public setFiltreEditeur(editeurId : number) : void {
     this.filtreEditeur = editeurId;
     this.refreshJeuxVideos();
   }
@@ -34,11 +34,11 @@ export class JeuxVideosRepositoryService {
     this.filtreEditeur = 0;
    }
 
-  getJeuxVideosAsObservable() : Observable<Page<JeuxVideo>> {
+   public getJeuxVideosAsObservable() : Observable<Page<JeuxVideo>> {
     return this.jeuxVideosSubject.asObservable();
   }
 
-  refreshJeuxVideos() : void {
+  public refreshJeuxVideos() : void {
     let urlParams = new HttpParams().set('page' , '' + this.numeroPage)
                                     .set('size', '4');
     if (this.filtreEditeur > 0) {
@@ -51,7 +51,7 @@ export class JeuxVideosRepositoryService {
             });
   }
 
-  getListeEditeurs() : Observable<Editeur[]> {
+  public getListeEditeurs() : Observable<Editeur[]> {
     return this.http.get<Editeur[]>(`${this.serviceUrl}/editeurs`); 
   }
 }
