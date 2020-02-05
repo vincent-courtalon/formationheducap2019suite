@@ -8,10 +8,30 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
+  it('should display company name in navbar', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('ZooManager app is running!');
+    //browser.pause(5000);
+    expect(page.getNavBarCompanyName()).toEqual('Zoo manager');
   });
+
+  it('should by default go to zoo list component', () => {
+    page.navigateTo();
+    //browser.sleep(10000);
+    expect(page.getListComponentTitle()).toEqual('liste des zoos');
+  });
+
+  it('should go to animaux list component when clicking on router link', () => {
+    page.navigateTo();
+    //browser.sleep(10000);
+    page.getLinkToClick("Liste Animaux").click();
+    browser.sleep(2000);
+    expect(page.getListComponentTitle()).toEqual('liste des animaux');
+    page.getLinkToClick("Liste Zoos").click();
+    browser.sleep(2000);
+    expect(page.getListComponentTitle()).toEqual('liste des zoos');
+  });
+
+
 
   afterEach(async () => {
     // Assert that there are no errors emitted from the browser
