@@ -97,8 +97,8 @@ public class ZooController {
 	@ApiOperation(value="effacer un zoo")
 	@ApiResponses(value = {
 			@ApiResponse(code=202, message = "zoo supprimé avec success"),
-			@ApiResponse(code=400, message = "impossible de mettre à jour ce zoo, id invalide"),
-			@ApiResponse(code=404, message = "impossible de mettre à jour ce zoo, zoo inconnu")
+			@ApiResponse(code=400, message = "impossible de supprimer ce zoo, id invalide"),
+			@ApiResponse(code=404, message = "impossible de supprimer ce zoo, zoo inconnu")
 	})	
 	public ResponseEntity<String> deleteZoo(@ApiParam(value = "identifiant du zoo, entier positif", example = "3") 
 											@PathVariable("id") int id) {
