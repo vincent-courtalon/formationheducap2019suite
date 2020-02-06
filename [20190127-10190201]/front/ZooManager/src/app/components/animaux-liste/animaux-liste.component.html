@@ -1,1 +1,22 @@
 <h2>liste des animaux</h2>
+<pagination [itemsPerPage]="pageSize"
+            [(ngModel)]="pageNo"
+            (pageChanged)="onPageChanged($event)"
+            [totalItems]="totalElements"></pagination>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>nom</th>
+            <th>espece</th>
+            <th>zoo</th>
+        </tr>
+    </thead>
+    <tbody *ngIf="animaux">
+        <tr *ngFor="let a of animaux">
+            <td>{{a.nom}}</td>
+            <td>{{a.espece}}</td>
+            <td *ngIf="a.zoo">{{a.zoo.nom}}</td>
+            <td *ngIf="!a.zoo">non affecté à un zoo</td>
+        </tr>
+    </tbody>
+</table>

@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/zoos")
 @Api(value = "Api des zoos",
 	description = "operations de listage et de manipulation des zoos")
+@CrossOrigin
 public class ZooController {
 
 	@Autowired private ZooRepository zooRepository;

@@ -17,4 +17,6 @@ export class AppPage {
   {
     return element(by.linkText(texte));
   }
+
+
 }
