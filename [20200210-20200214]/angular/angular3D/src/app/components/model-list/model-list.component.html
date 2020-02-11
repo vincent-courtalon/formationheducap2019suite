@@ -1,0 +1,27 @@
+<h2 class="h2">liste des modeles</h2>
+<form class="form">
+    <div class="form-group">
+        <label for="rotationSpeedX">rotation autour de l'axe X</label>
+        <input class="form-control"
+               type="range"
+               min="0"
+               max="0.1"
+               step="0.001"
+               name="rotationSpeedX"
+               [(ngModel)]="rotationSpeedX" />
+    </div>
+    <div class="form-group">
+        <label for="rotationSpeedY">rotation autour de l'axe Y</label>
+        <input class="form-control"
+               type="range"
+               min="0"
+               max="0.1"
+               step="0.001"
+               name="rotationSpeedY"
+               [(ngModel)]="rotationSpeedY" />
+    </div>
+</form>
+<app-model-viewer [rotationSpeedX]="rotationSpeedX"
+                  [rotationSpeedY]="rotationSpeedY"></app-model-viewer>
+<app-model-viewer [rotationSpeedX]="rotationSpeedX"
+                  [rotationSpeedY]="rotationSpeedY"></app-model-viewer>
