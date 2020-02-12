@@ -8,12 +8,14 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ModelViewerComponent } from './components/model-viewer/model-viewer.component';
 import { ModelListComponent } from './components/model-list/model-list.component';
+import { AdvancedModelViewerComponent } from './components/advanced-model-viewer/advanced-model-viewer.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ModelViewerComponent,
-    ModelListComponent
+    ModelListComponent,
+    AdvancedModelViewerComponent
   ],
   imports: [
     BrowserModule,

@@ -23,5 +23,25 @@
 </form>
 <app-model-viewer [rotationSpeedX]="rotationSpeedX"
                   [rotationSpeedY]="rotationSpeedY"></app-model-viewer>
-<app-model-viewer [rotationSpeedX]="rotationSpeedX"
-                  [rotationSpeedY]="rotationSpeedY"></app-model-viewer>
+<form>
+    <div class="form-group">
+        <label for="couleur">couleur du model</label>
+        <input  type="color"
+                name="couleur"
+                [(ngModel)]="couleur" />
+    </div>
+    <div class="form-group">
+        <label for="scale">taille du mug</label>
+        <input class="form-control"
+               type="range"
+               min="0.5"
+               max="2.0"
+               step="0.1"
+               name="scale"
+               [(ngModel)]="scale" />
+    </div>
+</form>                  
+<app-advanced-model-viewer [rotationSpeedX]="rotationSpeedX"
+                  [rotationSpeedY]="rotationSpeedY"
+                  [couleur]="couleur"
+                  [scale]="scale"></app-advanced-model-viewer>
