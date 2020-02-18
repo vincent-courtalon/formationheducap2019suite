@@ -44,7 +44,8 @@ public class SelectWhereMRjob  extends Configured implements Tool{
 				// je récupere les colonnes qui m'intéresse
 				String[] values = AirlineDataUtil.getSelectedColumnsA(value);
 				// je veux récuperer uniquement les vols qui on plus de retard que le parametre delayInMinute
-				if (AirlineDataUtil.parseMinutes(values[8], 0) > this.delayInMinute) {
+				if (AirlineDataUtil.parseMinutes(values[8], 0) > this.delayInMinute &&
+					AirlineDataUtil.parseMinutes(values[5], 0) > this.distanceMin) {
 					// c'est un vol qui m'intéresse
 					// passer toutes les colonnes ensemble à la suite
 					StringBuilder sb = AirlineDataUtil.mergeStringArray(values, ",");
@@ -61,6 +62,7 @@ public class SelectWhereMRjob  extends Configured implements Tool{
 			// on peut récuperer le parametre de la ligne de commande
 			// récupérer ce parametre, ou la valeur 1 si on le trouve pas
 			this.delayInMinute = context.getConfiguration().getInt("map.where.delay", 1);
+			this.distanceMin = context.getConfiguration().getInt("map.where.distance", 0);
 		}
 		
 	}
