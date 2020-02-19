@@ -5,6 +5,13 @@ import org.apache.hadoop.io.Text;
 
 public class AirlineDataUtil {
 
+	public static String[] parseCompanyDetails(Text line) {
+		String[] champs = line.toString().split("\",\"");
+		champs[0] = champs[0].replaceAll("\"", "");
+		champs[1] = champs[1].replaceAll("\"", "");
+		return champs;
+	}
+	
 	// cette fonction détecte si la ligne passée est la ligne aec les intitulés des colonnes
 	public static boolean isHeader(Text ligne) {
 		String[] champs = ligne.toString().split(",");
@@ -75,7 +82,25 @@ public class AirlineDataUtil {
 			champsOut[11] = getDiverted(champsIn);
 			return champsOut;
 		}
-	
+		
+		public static String[] getSelectedColumnsC(Text ligne) {
+			String[] champsIn = ligne.toString().split(",");
+			String[] champsOut = new String[13];
+			champsOut[0] = getDate(champsIn);
+			champsOut[1] = getDepartureTime(champsIn);
+			champsOut[2] = getArrivalTime(champsIn);
+			champsOut[3] = getOrigin(champsIn);
+			champsOut[4] = getDestination(champsIn);
+			champsOut[5] = getDistance(champsIn);
+			champsOut[6] = getElapsedTime(champsIn);
+			champsOut[7] = getScheduledElapsedTime(champsIn);
+			champsOut[8] = getDepartureDelay(champsIn);
+			champsOut[9] = getArrivalDelay(champsIn);
+			champsOut[10] = getCancelled(champsIn);
+			champsOut[11] = getDiverted(champsIn);
+			champsOut[12] = getUniqueCarrier(champsIn);
+			return champsOut;
+		}
 	
 	// construit la date a partir des 3 champs annee, mois et jour 
 	public static String getDate(String[] champs) {
