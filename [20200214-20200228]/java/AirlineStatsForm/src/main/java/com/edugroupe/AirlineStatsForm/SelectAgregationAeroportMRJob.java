@@ -24,20 +24,18 @@ import org.apache.hadoop.util.ToolRunner;
 import com.edugroupe.AirlineStatsForm.util.AirlineDataUtil;
 
 
-public class SelectAgregationDistanceMRJob extends Configured implements Tool {
+public class SelectAgregationAeroportMRJob extends Configured implements Tool {
 
-	public static final IntWritable DISTANCE_0_100 = new IntWritable(0);
-	public static final IntWritable DISTANCE_100_200 = new IntWritable(1);
-	public static final IntWritable DISTANCE_200_400 = new IntWritable(2);
-	public static final IntWritable DISTANCE_400_800 = new IntWritable(3);
-	public static final IntWritable DISTANCE_800_MARS = new IntWritable(4);
-	
-	
-	public static class VolMapper extends Mapper<LongWritable, Text, IntWritable, BooleanWritable> {
 
+	
+	public static class VolMapper extends Mapper<LongWritable, Text, Text, BooleanWritable> {
+
+		private int distanceMin = 0;
+		
 		@Override
-		protected void map(LongWritable key, Text value,
-				Mapper<LongWritable, Text, IntWritable, BooleanWritable>.Context context)
+		protected void map(LongWritable key,
+							Text value,
+							Context context)
 				throws IOException, InterruptedException {
 			if (!AirlineDataUtil.isHeader(value)) {
 				String[] values = AirlineDataUtil.getSelectedColumnsB(value);
@@ -45,27 +43,27 @@ public class SelectAgregationDistanceMRJob extends Configured implements Tool {
 				boolean isCancelled = AirlineDataUtil.parseBoolean(values[10], false);
 				boolean isDiverted = AirlineDataUtil.parseBoolean(values[11], false);
 				int distance = AirlineDataUtil.parseMinutes(values[5], 0);
-				
+				String origin = values[3];
 				boolean nonPonctuel = arrivalDelay > 15 || isCancelled || isDiverted;
-				if (distance < 100)
-					context.write(DISTANCE_0_100, new BooleanWritable(nonPonctuel));
-				else if (distance < 200)
-					context.write(DISTANCE_100_200, new BooleanWritable(nonPonctuel));
-				else if (distance < 400)
-					context.write(DISTANCE_200_400, new BooleanWritable(nonPonctuel));
-				else if (distance < 800)
-					context.write(DISTANCE_400_800, new BooleanWritable(nonPonctuel));
-				else
-					context.write(DISTANCE_800_MARS, new BooleanWritable(nonPonctuel));
+				if (distance >= this.distanceMin)
+					context.write(new Text(origin), new BooleanWritable(nonPonctuel));
 			}
 		}
-	}
-	
-	public static class VolReducer extends Reducer<IntWritable, BooleanWritable, NullWritable, Text> {
 
 		@Override
-		protected void reduce(IntWritable distance_class, Iterable<BooleanWritable> nonPonctuels,
-				Reducer<IntWritable, BooleanWritable, NullWritable, Text>.Context context)
+		protected void setup(Mapper<LongWritable, Text, Text, BooleanWritable>.Context context)
+				throws IOException, InterruptedException {
+			this.distanceMin = context.getConfiguration().getInt("map.where.distance", 0);
+		}
+		
+		
+	}
+	
+	public static class VolReducer extends Reducer<Text, BooleanWritable, NullWritable, Text> {
+
+		@Override
+		protected void reduce(Text origin, Iterable<BooleanWritable> nonPonctuels,
+							Context context)
 				throws IOException, InterruptedException {
 			
 			int totalVols = 0;
@@ -79,21 +77,13 @@ public class SelectAgregationDistanceMRJob extends Configured implements Tool {
 					volsPonctuels++;
 			}
 			
-			StringBuilder sb = new StringBuilder();
-			if (distance_class.equals(DISTANCE_0_100))
-				sb.append("vols 0-100: ");
-			else if (distance_class.equals(DISTANCE_100_200))
-				sb.append("vols 100-200: ");
-			else if (distance_class.equals(DISTANCE_200_400))
-				sb.append("vols 200-400: ");
-			else if (distance_class.equals(DISTANCE_400_800))
-				sb.append("vols 400-800: ");
-			else
-				sb.append("vols 800-mars: ");
+			StringBuilder sb = new StringBuilder("aeroport ").append(origin.toString());
+			double pourcentagePonctuel = (volsPonctuels * 100.0) / totalVols;
+			double pourcentageNonPonctuel = (volsNonPonctuels * 100.0) / totalVols;
 			
 			sb.append("total vols=").append(totalVols)
-			  .append(", non ponctuels=").append(volsNonPonctuels)
-			  .append(", ponctuels=").append(volsPonctuels);
+			  .append(" , non ponctuels= ").append(pourcentageNonPonctuel).append(" % ")
+			  .append(", ponctuels= ").append(pourcentagePonctuel).append(" % ");
 			
 			context.write(NullWritable.get(), new Text(sb.toString()));
 		}
@@ -105,7 +95,7 @@ public class SelectAgregationDistanceMRJob extends Configured implements Tool {
 	
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		ToolRunner.run(new SelectAgregationDistanceMRJob(), args);
+		ToolRunner.run(new SelectAgregationAeroportMRJob(), args);
 
 	}
 	
@@ -115,12 +105,12 @@ public class SelectAgregationDistanceMRJob extends Configured implements Tool {
 		// initialisation de notre job 
 		Job job = Job.getInstance(getConf());
 		
-		job.setJarByClass(SelectAgregationDistanceMRJob.class);
+		job.setJarByClass(SelectAgregationAeroportMRJob.class);
 		// sortie fichier
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);
 		//sortie mapper -> reducteur
-		job.setMapOutputKeyClass(IntWritable.class);
+		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(BooleanWritable.class);
 		
 		// choix du mapper et reducer
