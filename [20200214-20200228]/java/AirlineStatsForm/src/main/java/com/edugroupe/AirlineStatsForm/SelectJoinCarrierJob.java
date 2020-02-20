@@ -68,14 +68,42 @@ public class SelectJoinCarrierJob  extends Configured implements Tool{
 		protected void reduce(VolCompagnieClef clef, Iterable<Text> donnees,
 				Context context)
 				throws IOException, InterruptedException {
+			int totalVols = 0;
+			int total_vols_ok = 0;
+			double distance_vols = 0.0;
+			double retard_departs_vols = 0.0;
+			double retard_arrivees_vols = 0.0;
+			
 			for (Text donnee : donnees) {
 				if (clef.type_clef.get() == VolCompagnieClef.TYPE_COMPAGNIE) {
 					this.compagnieCourante = donnee.toString();
 				}
 				else {
-					context.write(NullWritable.get(),
-							new Text(donnee.toString() + ",\"" + this.compagnieCourante + "\""));
+					String[] champs = donnee.toString().split(",");
+					if (AirlineDataUtil.parseBoolean(champs[10], false) 
+						|| AirlineDataUtil.parseBoolean(champs[11], false)) {
+						totalVols++;
+					}
+					else {
+						totalVols++;
+						total_vols_ok++;
+						distance_vols += AirlineDataUtil.parseMinutes(champs[5], 0);
+						retard_departs_vols += AirlineDataUtil.parseMinutes(champs[8], 0);
+						retard_arrivees_vols += AirlineDataUtil.parseMinutes(champs[9], 0);
+					}
+					/*context.write(NullWritable.get(),
+							new Text(donnee.toString() + ",\"" + this.compagnieCourante + "\""));*/
 				}
+			}
+			
+			if (clef.type_clef.get() == VolCompagnieClef.TYPE_VOL) {
+				StringBuilder sb = new StringBuilder(compagnieCourante).append(": ");
+				sb.append(" total=").append(totalVols)
+					.append(", totalok=").append(total_vols_ok)
+					.append(", distance moy=").append(distance_vols / total_vols_ok)
+					.append(", retard depart moy=").append(retard_departs_vols / total_vols_ok)
+					.append(", retard arrivee moy=").append(retard_arrivees_vols / total_vols_ok);
+				context.write(NullWritable.get(), new Text(sb.toString()));
 			}
 		}
 		
