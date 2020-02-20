@@ -1,10 +1,32 @@
 package com.edugroupe.AirlineStatsForm.util;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.Text;
 
 public class AirlineDataUtil {
 
+	public static String[] parseAeroportDetails(Text line) {
+		String[] champs = line.toString().split("\",\"");
+		if (champs.length == 5) {
+			// cas "normal"
+			String[] champs_sup = champs[4].split(",");
+			champs_sup[0] = champs_sup[0].replaceAll("\"", "");
+			champs[0] = champs[0].replaceAll("\"", "");
+			// j'augmente le tableau de 2 cases
+			champs = Arrays.copyOf(champs, 7);
+			champs[4] = champs_sup[0];
+			champs[5] = champs_sup[1];
+			champs[6] = champs_sup[2];
+		}
+		else {
+			champs = Arrays.copyOf(champs, 7);
+			champs[0] = champs[0].replaceAll("\"", "");
+		}
+		return champs;
+	}
+	
 	public static String[] parseCompanyDetails(Text line) {
 		String[] champs = line.toString().split("\",\"");
 		champs[0] = champs[0].replaceAll("\"", "");
