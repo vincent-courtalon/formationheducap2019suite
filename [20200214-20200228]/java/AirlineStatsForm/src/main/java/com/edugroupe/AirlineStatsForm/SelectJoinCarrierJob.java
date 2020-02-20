@@ -10,7 +10,9 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
@@ -19,6 +21,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import com.edugroupe.AirlineStatsForm.util.AirlineDataUtil;
+import com.edugroupe.AirlineStatsForm.util.CompagnieCodePartitioner;
+import com.edugroupe.AirlineStatsForm.util.CompanyGroupComparator;
+import com.edugroupe.AirlineStatsForm.util.CompanySortComparator;
 import com.edugroupe.AirlineStatsForm.util.VolCompagnieClef;
 
 public class SelectJoinCarrierJob  extends Configured implements Tool{
@@ -54,6 +59,30 @@ public class SelectJoinCarrierJob  extends Configured implements Tool{
 	}
 	
 	
+	public static class VolCompagnieReducer extends Reducer<VolCompagnieClef, Text, NullWritable, Text> {
+		
+		private String compagnieCourante = "inconnue";
+
+		
+		@Override
+		protected void reduce(VolCompagnieClef clef, Iterable<Text> donnees,
+				Context context)
+				throws IOException, InterruptedException {
+			for (Text donnee : donnees) {
+				if (clef.type_clef.get() == VolCompagnieClef.TYPE_COMPAGNIE) {
+					this.compagnieCourante = donnee.toString();
+				}
+				else {
+					context.write(NullWritable.get(),
+							new Text(donnee.toString() + ",\"" + this.compagnieCourante + "\""));
+				}
+			}
+		}
+		
+		
+		
+	}
+	
 	public static void main(String[] args) throws Exception {
 		//Configuration conf = new Configuration();
 		ToolRunner.run(new SelectJoinCarrierJob(), args);
@@ -74,17 +103,33 @@ public class SelectJoinCarrierJob  extends Configured implements Tool{
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);
 		
-		//job.setMapperClass(AirlineMapper.class);
+		// sortie des mapper et entree reducteur
+		job.setMapOutputKeyClass(VolCompagnieClef.class);
+		job.setMapOutputValueClass(Text.class);
 		
-		// pas de reducteur
-		job.setNumReduceTasks(0);
+		job.setNumReduceTasks(2);
 		
 		// parsage des arguments en ligne de commande
 		String[] arguments = new GenericOptionsParser(getConf(), args).getRemainingArgs();
+
 		
-		FileInputFormat.setInputPaths(job, new Path(arguments[0]));
-	    FileOutputFormat.setOutputPath(job, new Path(arguments[1]));
+		// mapper des vols
+		MultipleInputs.addInputPath(job, new Path(arguments[0]), TextInputFormat.class, VolMapper.class);
+		// mapper des compagnies
+		MultipleInputs.addInputPath(job, new Path(arguments[1]), TextInputFormat.class, CompagnieMapper.class);
+
+		// sortie du reducer
+	    FileOutputFormat.setOutputPath(job, new Path(arguments[2]));
 		
+	    // tri et repartition pour notre jointure
+	    // INDISPENSABLE!
+	    job.setPartitionerClass(CompagnieCodePartitioner.class);
+	    job.setSortComparatorClass(CompanySortComparator.class);
+	    job.setGroupingComparatorClass(CompanyGroupComparator.class);
+	    
+	    // le reducteur
+	    job.setReducerClass(VolCompagnieReducer.class);
+	    
 	    boolean status = job.waitForCompletion(true);
 	     
         if (status) {
