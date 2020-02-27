@@ -1,5 +1,6 @@
 package reflectionform.metier;
 
+import reflectionform.util.PositiveOrZero;
 import reflectionform.util.PromptMessage;
 
 public class Livre {
@@ -17,7 +18,8 @@ public class Livre {
 													public String getAuteur() {return auteur;}
 	@PromptMessage(message = "nom auteur livre")	public void setAuteur(String auteur) {this.auteur = auteur;}
 													public int getNbPages() {return nbPages;}
-	@PromptMessage(message = "nb Pages livre")		public void setNbPages(int nbPages) {this.nbPages = nbPages;}
+	@PromptMessage(message = "nb Pages livre")
+	@PositiveOrZero 								public void setNbPages(int nbPages) {this.nbPages = nbPages;}
 													public double getPrix() {return prix;}
 													public void setPrix(double prix) {this.prix = prix;}
 	

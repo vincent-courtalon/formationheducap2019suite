@@ -1,5 +1,6 @@
 package reflectionform.metier;
 
+import reflectionform.util.PositiveOrZero;
 import reflectionform.util.PromptMessage;
 
 public class Produit {
@@ -23,7 +24,7 @@ public class Produit {
 	public int getId() {
 		return id;
 	}
-	@PromptMessage(message= "id du produit", order = 1)
+	@PromptMessage(order = 1)
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -38,6 +39,7 @@ public class Produit {
 		return prix;
 	}
 	@PromptMessage(message= "prix du produit", order = 4)
+	@PositiveOrZero
 	public void setPrix(double prix) {
 		this.prix = prix;
 	}
@@ -45,6 +47,7 @@ public class Produit {
 		return poids;
 	}
 	@PromptMessage(message= "poids du produit", order = 3)
+	@PositiveOrZero
 	public void setPoids(double poids) {
 		this.poids = poids;
 	}

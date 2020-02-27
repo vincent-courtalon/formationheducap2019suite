@@ -15,6 +15,48 @@ public class SuperPromptor<T1> {
 		this.t1Classe = classe;
 	}
 	
+	private void saisieDouble(T1 instance, Method m, String message, Scanner input) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		boolean mustBePositive = m.isAnnotationPresent(PositiveOrZero.class);
+		while(true) {
+			try {
+				System.out.println(message);
+				double saisie = Double.parseDouble(input.nextLine());
+				if (!mustBePositive || saisie >= 0.0) {
+					m.invoke(instance, saisie);
+					return;
+				}
+				System.out.println("nombre positif ou nul requis");
+			}
+			catch( NumberFormatException ex) {
+				System.out.println("uniquement un nombre valide svp!");
+			}
+		}
+	}
+
+	private void saisieInt(T1 instance, Method m, String message, Scanner input) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		boolean mustBePositive = m.isAnnotationPresent(PositiveOrZero.class);
+		while(true) {
+			try {
+				System.out.println(message);
+				int saisie = Integer.parseInt(input.nextLine());
+				if (!mustBePositive || saisie >= 0) {
+					m.invoke(instance, saisie);
+					return;
+				}
+				System.out.println("nombre positif ou nul requis");
+			}
+			catch( NumberFormatException ex) {
+				System.out.println("uniquement un nombre valide svp!");
+			}
+		}
+	}
+	
+	private void saisieString(T1 instance, Method m, String message, Scanner input) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		System.out.println(message);
+		String saisie = input.nextLine();
+		m.invoke(instance, saisie);
+	}
+
 	public T1 saisie() {
 		try {
 			Scanner input = new Scanner(System.in);
@@ -36,19 +78,13 @@ public class SuperPromptor<T1> {
 					m.getReturnType().equals(void.class) &&
 					m.getParameterCount() == 1) {
 					Class typeparam = m.getParameterTypes()[0];
-					// si c'est un int
-					if (typeparam.equals(int.class)) {
-						System.out.println(pm.message());
-						m.invoke(instance, Integer.parseInt(input.nextLine()));
-					}
-					else if (typeparam.equals(double.class)) {
-						System.out.println(pm.message());
-						m.invoke(instance, Double.parseDouble(input.nextLine()));
-					}
-					else if (typeparam.equals(String.class)) {
-						System.out.println(pm.message());
-						m.invoke(instance, input.nextLine());
-					}					
+					// si c'est un int, double, etc...
+					if (typeparam.equals(int.class))
+						saisieInt(instance, m, pm.message(), input);
+					else if (typeparam.equals(double.class))
+						saisieDouble(instance, m, pm.message(), input);	
+					else if (typeparam.equals(String.class))
+						saisieString(instance, m, pm.message(), input);
 				}
 			}
 			return instance;
