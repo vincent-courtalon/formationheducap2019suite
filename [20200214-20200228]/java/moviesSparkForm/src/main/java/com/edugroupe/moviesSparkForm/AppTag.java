@@ -9,12 +9,11 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import scala.Tuple2;
+import scala.Tuple3;
+import scala.Tuple4;
 
-/**
- * Hello world!
- *
- */
-public class App 
+
+public class AppTag 
 {
 	
 	public static class Rating implements Serializable {
@@ -70,6 +69,32 @@ public class App
 			String [] genres = line.substring(posLast+1).split("[|]");
 			return new Movie(Integer.parseInt(identifiant), title, genres);
 		}
+	}
+	
+	public static class Tag implements Serializable {
+		public int userId;
+		public int movieId;
+		public String tag;
+		public String timestamp;
+		
+		public Tag(int userId, int movieId, String tag, String timestamp) {
+			this.userId = userId;
+			this.movieId = movieId;
+			this.tag = tag;
+			this.timestamp = timestamp;
+		}
+		@Override
+		public String toString() {
+			return "Tag [userId=" + userId + ", movieId=" + movieId + ", tag=" + tag + ", timestamp=" + timestamp + "]";
+		}
+		
+		public static Tag fromCsvLine(String line) {
+			String[] champs = line.split(",");
+				return new Tag(	Integer.parseInt(champs[0]),
+								Integer.parseInt(champs[1]),
+								champs[2],
+								champs[3]);
+		}
 		
 	}
 	
@@ -80,68 +105,66 @@ public class App
        
        JavaSparkContext sc = new JavaSparkContext(conf);
        
-       JavaRDD<String> movieLines =
+       /*JavaRDD<String> movieLines =
     		   sc.textFile("/user/formation/moviedata/moviessmallinput/movies.csv")
     		   		.filter(l -> !l.startsWith("movieId"));
+       */
+       
+       JavaRDD<String> tagLines = 
+    		   sc.textFile("/user/formation/moviedata/tagssmallinput/tags.csv")
+    		   		.filter(l -> !l.startsWith("userId"));
        
        JavaRDD<String> ratingLines =
     		   sc.textFile("/user/formation/moviedata/ratingssmallinput/ratings.csv")
     		   		.filter(l -> !l.startsWith("userId"));
        
-       /*
-        * ratings  -> <movieId,Rating> 
-        * movies	-> <movieId, Movie>
-        * 
-        * pour permettre la jointure, il faut une clef commune (ici movieId) 
-        * entre les deux RDD
-        * 
-        */
+      
        
        JavaPairRDD<Integer, Rating> ratings = 
     		   ratingLines.map(l -> Rating.fromCsvLine(l))
     		   .mapToPair(r -> new Tuple2<Integer, Rating>(r.movieId, r));
      
        
-       //ratings.take(50).forEach(r -> System.out.println(r));
        
-       JavaPairRDD<Integer, Movie> movies =
-    		   movieLines.map(l -> Movie.fromCsvLine(l))
-    		   	.mapToPair(m -> new Tuple2<Integer, Movie>(m.movieId, m));
+       JavaPairRDD<Integer, Tag> tags =
+    		   tagLines.map(l -> Tag.fromCsvLine(l))
+    		   	.mapToPair(t -> new Tuple2<Integer, Tag>(t.movieId, t));
        
-       // jointure entre movie et rating
-       // (31, (rating(... 3.5), movie(...matrix))
-       // ...
-       JavaPairRDD<Integer, Tuple2<Rating, Movie>> jointure =
-    		   ratings.join(movies);
        
-       // (31, (rating(... 3.5), movie(matrix)) ---> ("matrix", (3.5, 1))
-       // (31, (rating(... 4.5), movie(matrix)) ---> ("matrix", (4.5, 1))
+       
+       JavaPairRDD<Integer, Tuple2<Rating, Tag>> jointure =
+    		   ratings.join(tags);
+       
        
        
        //jointure.take(200).forEach(r -> System.out.println(r));
        
        
-       JavaPairRDD<String, Tuple2<Double, Integer>> reduction =
+       JavaPairRDD<String, Tuple4<Integer, Double, Double, Double>> reduction =
     		   jointure.mapToPair(
-    		j -> new Tuple2<String, Tuple2<Double, Integer>>(
-    				   j._2._2.title,
-    				   new Tuple2<Double, Integer>(j._2._1.rating, 1)
+    		j -> new Tuple2<String, Tuple4<Integer, Double, Double, Double>>(
+    				   j._2._2.tag,
+    				   new Tuple4<Integer, Double, Double, Double>
+    				   			  (1,j._2._1.rating,j._2._1.rating, j._2._1.rating)
     				   ))
-    		   // --> (matrix -> (3.5, 1)) ,(matrix -> (4.5, 1)), (batman -> (4.0, 1)) ,   
-    		   .reduceByKey((mrA, mrB) -> new Tuple2<Double, Integer>(
-    				   					mrA._1 + mrB._1,
-    				   					mrA._2 + mrB._2));
-       // (matrix -> (18.5, 4)) 
-       //reduction.take(500).forEach(r -> System.out.println(r));
+    		   .reduceByKey((mrA, mrB) -> new Tuple4<Integer, Double, Double, Double>(
+    				   					mrA._1() + mrB._1(),	// compteur
+    				   					mrA._2() + mrB._2(),	// somme rating
+    				   					Math.min(mrA._3(), mrB._3()), // plus petit tating
+    				   					Math.max(mrA._4(), mrB._4()))); // plus grand rating
+       
+       // reduction.take(500).forEach(r -> System.out.println(r));
        
        
        
-       JavaPairRDD<String, Double> moyennes = 
-    		   reduction.filter(r -> r._2._2 >= 3)
-    		   			.mapToPair(r -> new Tuple2<String, Double>(r._1, r._2._1 / r._2._2));
+       JavaPairRDD<String, Tuple3<Double, Double, Double>> moyennes = 
+    		   reduction.filter(r -> r._2._1() >= 3)
+    		   			.mapToPair(r -> new Tuple2<String, Tuple3<Double, Double, Double>>(
+    		   				r._1,
+    		   				new Tuple3<Double, Double, Double>(r._2._2() / r._2._1(), r._2._3(), r._2._4())));
        
-       moyennes.saveAsTextFile("/user/formation/moviedata/moyenneratings1");
-       
+       moyennes.saveAsTextFile("/user/formation/moviedata/moyennetags1");
+     
        sc.close();
     }
 }
